@@ -29,45 +29,47 @@ graylog:
         - .secret.env
         - master.env
     # Comment this out in order to send GELF messages for a GELF input
-    #ports: 
-    #    - "12201:12201/udp"
+    ports: 
+        - "12201:12201/udp"
     volumes_from:
         - data
-    links:
+#    links:
         - rabbitmq
     volumes:
         - /etc/localtime:/etc/localtime:ro # Share timezone data with host
 
 
-rabbitmq:
-    restart: always
-    build: rabbitmq
-    ports:
-        - "5672:5672"
-    env_file:
-        - .secret.rabbitmq
-    environment:
-        - RABBITMQ_NODENAME=rabbit-logs
-    hostname: rabbit-logs
+#rabbitmq:
+#    restart: always
+#    build: rabbitmq
+#    ports:
+#        - "5672:5672"
+#    env_file:
+#        - .secret.rabbitmq
+#    environment:
+#        - RABBITMQ_NODENAME=rabbit-logs
+#    hostname: rabbit-logs
 
-# Run this one-time only in order to setup rabbitmq
-# Do the configuration from container in order not to expose
-# the configuration REST API globally
-rabbitmqconfig:
-    image: radial/busyboxplus:curl
-    volumes:
-        - ./rabbitconfig/config.sh:/config.sh:ro
-    links:
-        - rabbitmq
-    env_file:
-        - .secret.rabbitmq
-    environment:
-        - BROKER=rabbitmq
-    command: /config.sh
+## Run this one-time only in order to setup rabbitmq
+## Do the configuration from container in order not to expose
+## the configuration REST API globally
+#rabbitmqconfig:
+#    image: radial/busyboxplus:curl
+#    volumes:
+#        - ./rabbitconfig/config.sh:/config.sh:ro
+#    links:
+#        - rabbitmq
+#    env_file:
+#        - .secret.rabbitmq
+#    environment:
+#        - BROKER=rabbitmq
+#    command: /config.sh
 
 data:
     image: busybox
+    restart: always
+    tty: true  # '--restart=always -dt  busybox cat' to keep the data volume container around, idle/sleeping
     volumes:
         - /data
         - /log
-    command: true
+    command: cat
