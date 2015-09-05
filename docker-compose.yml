@@ -34,7 +34,7 @@ graylog:
     volumes_from:
         - data
 #    links:
-        - rabbitmq
+#        - rabbitmq
     volumes:
         - /etc/localtime:/etc/localtime:ro # Share timezone data with host
 
@@ -68,8 +68,7 @@ graylog:
 data:
     image: busybox
     restart: always
-    tty: true  # '--restart=always -dt  busybox cat' to keep the data volume container around, idle/sleeping
     volumes:
         - /data
         - /log
-    command: cat
+    command: tail -f /dev/null
